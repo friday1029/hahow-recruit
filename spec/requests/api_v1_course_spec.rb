@@ -135,6 +135,9 @@ RSpec.describe Api::V1::CoursesController, type: :request do
       expect(res.dig("status")).to eq "ng"
       expect(res.dig("message")).to eq ["Chapters units can't be blank"]
     end
+
+    pending "需要儲存「章節」和「單元」的順序"
+
   end
 
 
