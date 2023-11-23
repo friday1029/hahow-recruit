@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_11_23_013329) do
+ActiveRecord::Schema.define(version: 2023_11_23_022817) do
 
   create_table "chapters", force: :cascade do |t|
     t.string "name"
@@ -29,5 +29,17 @@ ActiveRecord::Schema.define(version: 2023_11_23_013329) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "units", force: :cascade do |t|
+    t.string "name"
+    t.text "desc"
+    t.text "content"
+    t.integer "chapter_id", null: false
+    t.integer "seq"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["chapter_id"], name: "index_units_on_chapter_id"
+  end
+
   add_foreign_key "chapters", "courses"
+  add_foreign_key "units", "chapters"
 end

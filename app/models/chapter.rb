@@ -19,5 +19,7 @@
 #
 class Chapter < ApplicationRecord
   belongs_to :course
-  validates :name, presence: true
+  has_many :units, inverse_of: :chapter, dependent: :destroy
+  accepts_nested_attributes_for :units, reject_if: :all_blank, allow_destroy: true
+  validates_presence_of :name, :units
 end

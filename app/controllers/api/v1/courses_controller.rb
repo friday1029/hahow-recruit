@@ -3,7 +3,7 @@ class Api::V1::CoursesController < ActionController::Base
   protect_from_forgery with: :null_session # @todo 先關掉 CSRF, 後續用是否登入擋.
 
   def index
-    @courses = Course.includes(:chapters).order(:id).order("chapters.seq ASC")
+    @courses = Course.includes(:chapters).order(:id)
     render json: {
       courses: @courses.map{ |course| {course: show_course(course)}}
     }
@@ -71,7 +71,13 @@ class Api::V1::CoursesController < ActionController::Base
   private
     def show_course course
       course.attributes.merge(
-        chapters: course.chapters.order(seq: :asc)
+        chapters: course.chapters.order(seq: :asc).map{ |chapter| chapter.attributes.merge(show_chapter(chapter)) }
+      )
+    end
+
+    def show_chapter chapter
+      chapter.attributes.merge(
+        units: chapter.units.order(seq: :asc)
       )
     end
     # Use callbacks to share common setup or constraints between actions.
@@ -82,7 +88,9 @@ class Api::V1::CoursesController < ActionController::Base
     # Only allow a list of trusted parameters through.
     def course_params
       params.require(:course).permit(:name, :desc, :lecturer, 
-        chapters_attributes: [:id, :name, :seq, :_destroy]
+        chapters_attributes: [:id, :name, :seq, :_destroy, 
+          units_attributes: [:id, :name, :desc, :content, :seq, :_destroy] 
+        ]
       )
     end
 end
