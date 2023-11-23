@@ -5,13 +5,13 @@ class Api::V1::CoursesController < ActionController::Base
   def index
     @courses = Course.includes(:chapters).order(:id)
     render json: {
-      courses: @courses.map{ |course| show_course(course)}
+      courses: @courses.as_json(include: { chapters: { include: :units } })
     }
   end
 
   def show
     render json: {
-      course: show_course(@course)
+      course: @course.as_json(include: { chapters: { include: :units}})
     }
   end
 
@@ -20,7 +20,7 @@ class Api::V1::CoursesController < ActionController::Base
     if @course.save
       # @todo,refactor 各method render json方式
       render json: {
-        course: show_course(@course),
+        course: @course.as_json(include: { chapters: { include: :units}}),
         status: :ok
       }
     else
@@ -34,7 +34,7 @@ class Api::V1::CoursesController < ActionController::Base
   def update
     if @course.update(course_params)
       render json: {
-        course: show_course(@course),
+        course: @course.as_json(include: { chapters: { include: :units}}),
         status: :ok
       }
     else
@@ -62,17 +62,6 @@ class Api::V1::CoursesController < ActionController::Base
   end
 
   private
-    def show_course course
-      course.attributes.merge(
-        chapters: course.chapters.order(seq: :asc).map{ |chapter| chapter.attributes.merge(show_chapter(chapter)) }
-      )
-    end
-
-    def show_chapter chapter
-      chapter.attributes.merge(
-        units: chapter.units.order(seq: :asc)
-      )
-    end
     # Use callbacks to share common setup or constraints between actions.
     def set_course
       @course = Course.includes(:chapters).find_by(id: params[:id])
