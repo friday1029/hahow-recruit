@@ -120,6 +120,21 @@ RSpec.describe Api::V1::CoursesController, type: :request do
       expect(res.dig("message").sort).to eq ["Chapters units name can't be blank", "Chapters units content can't be blank"].sort
     end
 
+    it "沒有章節參數回傳錯誤" do
+      course_attributes.delete("chapters_attributes") # 清空章節
+      post api_v1_courses_path(course: course_attributes)
+      res = JSON.parse(response.body)
+      expect(res.dig("status")).to eq "ng"
+      expect(res.dig("message")).to eq ["Chapters can't be blank"]
+    end
+
+    it "沒有單元參數回傳錯誤" do
+      course_attributes["chapters_attributes"].sample.delete("units_attributes")  # 清空單元
+      post api_v1_courses_path(course: course_attributes)
+      res = JSON.parse(response.body)
+      expect(res.dig("status")).to eq "ng"
+      expect(res.dig("message")).to eq ["Chapters units can't be blank"]
+    end
   end
 
 
