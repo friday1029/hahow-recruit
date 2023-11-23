@@ -212,6 +212,9 @@ RSpec.describe Api::V1::CoursesController, type: :request do
       expect(res.dig("status")).to eq "ng"
       expect(res.dig("message")).to eq '物件不存在'
     end
+
+    pending "刪除課程失敗時,回傳錯誤訊息"
+    # @todo, 如何故意製造刪除失敗的狀況
   end
 
 end
