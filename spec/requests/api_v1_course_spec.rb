@@ -188,4 +188,30 @@ RSpec.describe Api::V1::CoursesController, type: :request do
 
   end
 
+  # ==========
+  # 刪除課程
+  # ==========
+  describe "刪除課程" do
+    it "刪除課程路徑沒有問題" do
+      delete api_v1_course_path(id: Course.all.sample)
+      expect(response).to be_successful
+    end
+
+    it "刪除課程時, 章節和單元也一起刪除" do
+      course = Course.all.sample
+      chapter_ids = course.chapters.ids
+      unit_ids = course.chapters.map{ |chapter| chapter.units.ids}.flatten
+      delete api_v1_course_path(id: course.id)
+      expect(Chapter.where(id: chapter_ids).size).to be 0
+      expect(Unit.where(id: unit_ids).size).to be 0
+    end
+
+    it "要刪除的課程不存在時，回傳錯誤訊息" do
+      delete api_v1_course_path(id: (Course.last.id + 1))
+      res = JSON.parse(response.body)
+      expect(res.dig("status")).to eq "ng"
+      expect(res.dig("message")).to eq '物件不存在'
+    end
+  end
+
 end
