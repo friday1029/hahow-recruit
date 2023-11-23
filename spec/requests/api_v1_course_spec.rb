@@ -22,6 +22,15 @@ RSpec.describe Api::V1::CoursesController, type: :request do
     )
   } # let(:course_attributes)
 
+  let(:update_course_attributes) { 
+    course = Course.all.sample
+    course.attributes.merge(
+      "chapters_attributes" => course.chapters.map{ |chapter| chapter.attributes.merge(
+        "units_attributes" => chapter.units.map{ |unit| unit.attributes }
+      )}
+    )
+  } # let(:update_course_attributes)
+
   # ==========
   # 課程列表
   # ==========
@@ -140,5 +149,43 @@ RSpec.describe Api::V1::CoursesController, type: :request do
 
   end
 
+  # ==========
+  # 編輯課程
+  # ==========
+  describe "編輯課程" do
+    it "編輯課程路徑沒有問題" do
+      put api_v1_course_path(id: Course.all.sample, course: { name: "name"}) # 測路徑, params 不重要
+      expect(response).to be_successful
+    end
+
+    it "課程必填欄位沒填回傳錯誤" do
+      update_course_attributes["name"] = ""      # 清空課程名稱
+      update_course_attributes["lecturer"] = ""  # 清空講師
+      put api_v1_course_path(id: update_course_attributes.dig("id"), course: update_course_attributes)
+      res = JSON.parse(response.body)
+      expect(res.dig("status")).to eq "ng"
+      expect(res.dig("message")).to eq ["Name can't be blank", "Lecturer can't be blank"]
+    end
+
+    it "章節必填欄位沒填回傳錯誤" do
+      update_course_attributes["chapters_attributes"].sample["name"] = "" # 清空章節課程名稱
+      put api_v1_course_path(id: update_course_attributes.dig("id"), course: update_course_attributes)
+      res = JSON.parse(response.body)
+      expect(res.dig("status")).to eq "ng"
+      expect(res.dig("message")).to eq ["Chapters name can't be blank"]
+    end
+
+    it "單元必填欄位沒填回傳錯誤" do
+      update_course_attributes["chapters_attributes"].sample["units_attributes"].sample["name"] = "" # 清空單元名稱
+      update_course_attributes["chapters_attributes"].sample["units_attributes"].sample["content"] = "" # 清空單元內容
+      put api_v1_course_path(id: update_course_attributes.dig("id"), course: update_course_attributes)
+      res = JSON.parse(response.body)
+      expect(res.dig("status")).to eq "ng"
+      expect(res.dig("message").sort).to eq ["Chapters units name can't be blank", "Chapters units content can't be blank"].sort
+    end
+
+    pending "「章節」和「單元」的順序都可以被調整"
+
+  end
 
 end
