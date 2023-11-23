@@ -12,6 +12,19 @@ RSpec.describe Api::V1::CoursesController, type: :request do
       course.save
     end if Course.count == 0
   end
+
+  let(:course_attributes) { 
+    course = FactoryBot.build(:course, chapters: rand(1..5).times.map{|i| (FactoryBot.build(:chapter, units: FactoryBot.build_list(:unit,rand(1..5)))) })
+    course.attributes.merge(
+      "chapters_attributes" => course.chapters.map{ |chapter| chapter.attributes.merge(
+        "units_attributes" => chapter.units.map{ |unit| unit.attributes }
+      )}
+    )
+  } # let(:course_attributes)
+
+  # ==========
+  # 課程列表
+  # ==========
   describe "課程列表" do
     it "課程列表路徑沒有問題" do
       get api_v1_courses_path
@@ -37,6 +50,9 @@ RSpec.describe Api::V1::CoursesController, type: :request do
     end
   end
 
+  # ==========
+  # 課程詳細資訊
+  # ==========
   describe "課程詳細資訊" do
     it "課程詳細資訊路徑沒有問題" do
       get api_v1_course_path(Course.all.sample)
@@ -61,5 +77,50 @@ RSpec.describe Api::V1::CoursesController, type: :request do
       expect(res_column_names).to eq unit_column_names
     end
   end
+
+  # ==========
+  # 建立課程
+  # ==========
+  describe "建立課程" do
+    it "建立課程路徑沒有問題" do
+      post api_v1_courses_path(course: { name: "name"}) # 測路徑, params 不重要
+      expect(response).to be_successful
+    end
+
+    it "課程、章節、單元同時被建立" do
+      post api_v1_courses_path(course: course_attributes)
+      res = JSON.parse(response.body)
+      expect(res.dig("course", "chapters").size).to be > 0
+      expect(res.dig("course", "chapters").sample.dig("units").size).to be > 0
+    end
+
+    it "課程必填欄位沒填回傳錯誤" do
+      course_attributes["name"] = ""      # 清空課程名稱
+      course_attributes["lecturer"] = ""  # 清空講師
+      post api_v1_courses_path(course: course_attributes)
+      res = JSON.parse(response.body)
+      expect(res.dig("status")).to eq "ng"
+      expect(res.dig("message")).to eq ["Name can't be blank", "Lecturer can't be blank"]
+    end
+
+    it "章節必填欄位沒填回傳錯誤" do
+      course_attributes["chapters_attributes"].sample["name"] = "" # 清空章節課程名稱
+      post api_v1_courses_path(course: course_attributes)
+      res = JSON.parse(response.body)
+      expect(res.dig("status")).to eq "ng"
+      expect(res.dig("message")).to eq ["Chapters name can't be blank"]
+    end
+
+    it "單元必填欄位沒填回傳錯誤" do
+      course_attributes["chapters_attributes"].sample["units_attributes"].sample["name"] = "" # 清空單元名稱
+      course_attributes["chapters_attributes"].sample["units_attributes"].sample["content"] = "" # 清空單元內容
+      post api_v1_courses_path(course: course_attributes)
+      res = JSON.parse(response.body)
+      expect(res.dig("status")).to eq "ng"
+      expect(res.dig("message").sort).to eq ["Chapters units name can't be blank", "Chapters units content can't be blank"].sort
+    end
+
+  end
+
 
 end
