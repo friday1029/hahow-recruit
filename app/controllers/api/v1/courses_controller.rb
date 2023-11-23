@@ -3,15 +3,15 @@ class Api::V1::CoursesController < ActionController::Base
   protect_from_forgery with: :null_session # @todo 先關掉 CSRF, 後續用是否登入擋.
 
   def index
-    @courses = Course.all
+    @courses = Course.includes(:chapters).order(:id).order("chapters.seq ASC")
     render json: {
-      courses: @courses
+      courses: @courses.map{ |course| {course: show_course(course)}}
     }
   end
 
   def show
     render json: {
-      course: @course
+      course: show_course(@course)
     }
   end
 
@@ -20,12 +20,12 @@ class Api::V1::CoursesController < ActionController::Base
     if @course.save
       # @todo,refactor 各method render json方式
       render json: {
-        course: @course,
+        course: show_course(@course),
         status: :ok
       }
     else
       render json: {
-        message: @course.errors,
+        message: @course.errors.full_messages,
         status: :ng
       }
     end
@@ -34,12 +34,12 @@ class Api::V1::CoursesController < ActionController::Base
   def update
     if @course.update(course_params)
       render json: {
-        course: @course,
+        course: show_course(@course),
         status: :ok
       }
     else
       render json: {
-        message: @course.errors,
+        message: @course.errors.full_messages,
         status: :ng
       }
     end
@@ -56,7 +56,7 @@ class Api::V1::CoursesController < ActionController::Base
         }
       else
         render json: {
-          message: @course.errors,
+          message: @course.errors.full_messages,
           status: :ng
         }
       end
@@ -69,13 +69,20 @@ class Api::V1::CoursesController < ActionController::Base
   end
 
   private
+    def show_course course
+      course.attributes.merge(
+        chapters: course.chapters.order(seq: :asc)
+      )
+    end
     # Use callbacks to share common setup or constraints between actions.
     def set_course
-      @course = Course.find_by(id: params[:id])
+      @course = Course.includes(:chapters).find_by(id: params[:id])
     end
 
     # Only allow a list of trusted parameters through.
     def course_params
-      params.require(:course).permit(:name, :desc, :lecturer)
+      params.require(:course).permit(:name, :desc, :lecturer, 
+        chapters_attributes: [:id, :name, :seq, :_destroy]
+      )
     end
 end

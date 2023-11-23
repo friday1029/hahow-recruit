@@ -10,5 +10,7 @@
 #  updated_at :datetime         not null
 #
 class Course < ApplicationRecord
-  validates_presence_of :name, :lecturer
+  has_many :chapters, inverse_of: :course, dependent: :destroy
+  accepts_nested_attributes_for :chapters, reject_if: :all_blank, allow_destroy: true
+  validates_presence_of :name, :lecturer, :chapters
 end
