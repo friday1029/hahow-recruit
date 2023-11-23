@@ -5,7 +5,7 @@ class Api::V1::CoursesController < ActionController::Base
   def index
     @courses = Course.includes(:chapters).order(:id)
     render json: {
-      courses: @courses.map{ |course| {course: show_course(course)}}
+      courses: @courses.map{ |course| show_course(course)}
     }
   end
 
