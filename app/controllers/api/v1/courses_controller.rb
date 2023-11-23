@@ -47,22 +47,15 @@ class Api::V1::CoursesController < ActionController::Base
 
   def destroy
     #@todo, 判斷是否有刪除的權限
-    if @course.present?
-      course_id = @course.id
-      if @course.destroy
-        render json: {
-          course: {id: course_id},
-          status: :ok
-        }
-      else
-        render json: {
-          message: @course.errors.full_messages,
-          status: :ng
-        }
-      end
+    course_id = @course.id
+    if @course.destroy
+      render json: {
+        course: {id: course_id},
+        status: :ok
+      }
     else
       render json: {
-        message: '物件不存在',
+        message: @course.errors.full_messages,
         status: :ng
       }
     end
@@ -83,6 +76,12 @@ class Api::V1::CoursesController < ActionController::Base
     # Use callbacks to share common setup or constraints between actions.
     def set_course
       @course = Course.includes(:chapters).find_by(id: params[:id])
+      if @course.blank?
+        return render json: {
+          message: '物件不存在',
+          status: :ng
+        }
+      end
     end
 
     # Only allow a list of trusted parameters through.
