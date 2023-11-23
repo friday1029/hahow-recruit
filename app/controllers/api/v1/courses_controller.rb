@@ -64,7 +64,7 @@ class Api::V1::CoursesController < ActionController::Base
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_course
-      @course = Course.includes(:chapters).find_by(id: params[:id])
+      @course = Course.includes(chapters: :units).find_by(id: params[:id])
       if @course.blank?
         return render json: {
           message: '物件不存在',
