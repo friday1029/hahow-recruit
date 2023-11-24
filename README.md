@@ -1,7 +1,29 @@
 # README
 
-* 我們該如何執行這個 server
-
+* 如何執行這個 API server
+  - Servers
+    `https://hahow.davidcheng.tw/api/v1`
+  - 課程列表
+    `GET /courses`
+    **No Parameters**
+  - 課程詳細資訊
+    `GET /courses/{course Id}`
+    **No Parameters**
+  - 建立課程
+    `post /courses`
+    **Parameters**
+    params[course]: name(string), desc(text), lecturer(string), 
+    params[course][chapters_attributes]: [name(string), seq(integer), _destroy(boolean)]
+    params[course][chapters_attributes][units_attributes]: [name(string), desc(text), content(text), seq(integer), _destroy(boolean)]
+  - 編輯課程
+    `put /courses/{course Id}`
+    **Parameters**
+    params[course]: name(string), desc(text), lecturer(string), 
+    params[course][chapters_attributes]: [id(integer), name(string), seq(integer), _destroy(boolean)]
+    params[course][chapters_attributes][units_attributes]: [id(integer), name(string), desc(text), content(text), seq(integer), _destroy(boolean)]    
+  - 刪除課程
+    `DELETE /courses/{course Id}`
+    **No Parameters**
 * 專案的架構，API server 的架構邏輯
 * 使用到的第三方 Gem 及功能簡介
   - gem 'foreman'
