@@ -2,14 +2,14 @@
 #
 # Table name: units
 #
-#  id         :integer          not null, primary key
+#  id         :bigint           not null, primary key
 #  content    :text
 #  desc       :text
 #  name       :string
 #  seq        :integer
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  chapter_id :integer          not null
+#  chapter_id :bigint           not null
 #
 # Indexes
 #
@@ -17,7 +17,7 @@
 #
 # Foreign Keys
 #
-#  chapter_id  (chapter_id => chapters.id)
+#  fk_rails_...  (chapter_id => chapters.id)
 #
 class Unit < ApplicationRecord
   belongs_to :chapter

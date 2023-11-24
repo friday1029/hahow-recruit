@@ -2,12 +2,12 @@
 #
 # Table name: chapters
 #
-#  id         :integer          not null, primary key
+#  id         :bigint           not null, primary key
 #  name       :string
 #  seq        :integer
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  course_id  :integer          not null
+#  course_id  :bigint           not null
 #
 # Indexes
 #
@@ -15,7 +15,7 @@
 #
 # Foreign Keys
 #
-#  course_id  (course_id => courses.id)
+#  fk_rails_...  (course_id => courses.id)
 #
 class Chapter < ApplicationRecord
   belongs_to :course
