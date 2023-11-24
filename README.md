@@ -24,7 +24,29 @@
   - 刪除課程  
     `DELETE /courses/{course Id}`  
     **No Parameters**  
-* 專案的架構，API server 的架構邏輯  
+* 專案的架構，API server 的架構邏輯
+  **Model**
+  - Course: 課程  
+    每個課程能有多個章節(has_many chapters)  
+  - Chapter: 章節  
+    每個章節屬於一個課程(belongs_to course)  
+    每個章節能有多個單元(has_many units)  
+  - Unit: 單元  
+      每個單元屬於一個章節(belongs_to chapter)
+
+  **Route**  
+  ```
+  namespace :api do 
+    namespace :v1 do 
+      resources :courses, except: [:new, :edit]
+    end
+  end
+    ```
+  `api`表示是用於api的路徑  
+  `v1`表示該api的版本,若後續有進版,將改為v2,以此類推.  
+  使用不同路徑是為了避免進版新增/修改時,  
+  影響到已經在使用api的其他程式.  
+  
 * 使用到的第三方 Gem 及功能簡介  
   - gem 'foreman'  
     便於批次執行多個指令  
