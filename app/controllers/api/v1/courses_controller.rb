@@ -51,7 +51,7 @@ class Api::V1::CoursesController < ActionController::Base
     course_id = @course.id
     if @course.destroy
       render json: {
-        course: {id: course_id},
+        message: "Course was successfully destroyed",
         status: :ok
       }
     else
