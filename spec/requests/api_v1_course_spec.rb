@@ -145,7 +145,18 @@ RSpec.describe Api::V1::CoursesController, type: :request do
       expect(res.dig("message")).to eq ["Chapters units can't be blank"]
     end
 
-    pending "需要儲存「章節」和「單元」的順序"
+    it "建立課程後，確定課程中的章節及單元的 seq 欄位皆有值" do
+      post api_v1_courses_path(course: course_attributes)
+      res = JSON.parse(response.body)
+      # 確認章節的seq
+      chapter_seq_result = res.dig("course", "chapters").pluck("seq").all? { |element| element.is_a?(Integer) }
+      expect(chapter_seq_result).to be true
+      # 確認各章節中單元的seq
+      res.dig("course", "chapters").each do |chapter|
+        unit_seq_result = chapter.dig("units").pluck("seq").all? { |element| element.is_a?(Integer) }
+        expect(unit_seq_result).to be true
+      end
+    end
 
   end
 
@@ -184,8 +195,18 @@ RSpec.describe Api::V1::CoursesController, type: :request do
       expect(res.dig("message").sort).to eq ["Chapters units name can't be blank", "Chapters units content can't be blank"].sort
     end
 
-    pending "「章節」和「單元」的順序都可以被調整"
-
+    it "章節」和「單元」的順序都可以被調整" do
+      new_chapter_seq = rand(1..50)
+      new_unit_seq = rand(1..50)
+      update_chapter_id = update_course_attributes["chapters_attributes"].first["id"]
+      update_unit_id = update_course_attributes["chapters_attributes"].last["units_attributes"].last["id"]
+      update_course_attributes["chapters_attributes"].first["seq"] = new_chapter_seq # 設定章節新順序
+      update_course_attributes["chapters_attributes"].last["units_attributes"].last["seq"] = new_unit_seq # 設定單元新順序
+      put api_v1_course_path(id: update_course_attributes.dig("id"), course: update_course_attributes)
+      # 直接確認資料庫要修改的章節或單元 seq
+      expect(Chapter.find(update_chapter_id).seq).to be new_chapter_seq
+      expect(Unit.find(update_unit_id).seq).to be new_unit_seq
+    end
   end
 
   # ==========
