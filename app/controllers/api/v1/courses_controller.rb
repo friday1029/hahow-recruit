@@ -11,7 +11,8 @@ class Api::V1::CoursesController < ActionController::Base
 
   def show
     render json: {
-      course: @course.as_json(include: { chapters: { include: :units}})
+      course: @course.as_json(include: { chapters: { include: :units}}),
+      status: :ok
     }
   end
 
