@@ -2,28 +2,239 @@
   
 * 如何執行這個 API server  
   - Servers  
-    `https://hahow.davidcheng.tw/api/v1`  
+    - 己部署網址  
+      `https://hahow.davidcheng.tw/api/v1`  
+    - 本機執行  
+      ```
+      $ git clone https://github.com/friday1029/hahow-recruit.git
+      $ cd hahow-recruit
+      $ foreman s
+      # http://localhost:3000/api/v1
+      ```
   - 課程列表  
     `GET /courses`  
     **No Parameters**  
+    - 查詢成功回傳範例
+    ```
+    {
+      "courses": [{
+          "id": 1,
+          "name": "course_name_1",
+          "lecturer": "course_lecturer_1",
+          "desc": "course_desc_1",
+          "created_at": "2023-11-24T09:46:11.462+08:00",
+          "updated_at": "2023-11-24T09:48:38.496+08:00",
+          "chapters": [{
+              "id": 1,
+              "name": "chapter_name_1",
+              "course_id": 1,
+              "seq": 1,
+              "created_at": "2023-11-24T09:46:11.467+08:00",
+              "updated_at": "2023-11-24T09:46:11.467+08:00",
+              "units": [{
+                  "id": 1,
+                  "name": "unit_name_1",
+                  "desc": "unit_desc_1",
+                  "content": "unit_content_1",
+                  "chapter_id": 1,
+                  "seq": 1,
+                  "created_at": "2023-11-24T09:46:11.470+08:00",
+                  "updated_at": "2023-11-24T09:46:11.470+08:00"
+              }]
+          }]
+      }]
+    }
+    ```
   - 課程詳細資訊  
     `GET /courses/{course Id}`  
     **No Parameters**  
+    - 查詢成功回傳範例
+    ```
+      {
+        "course": {
+            "id": 1,
+            "name": "course_name_1",
+            "lecturer": "course_lecturer_1",
+            "desc": "course_desc_1",
+            "created_at": "2023-11-24T09:46:11.462+08:00",
+            "updated_at": "2023-11-24T09:48:38.496+08:00",
+            "chapters": [{
+                "id": 1,
+                "name": "chapter_name_1",
+                "course_id": 1,
+                "seq": 1,
+                "created_at": "2023-11-24T09:46:11.467+08:00",
+                "updated_at": "2023-11-24T09:46:11.467+08:00",
+                "units": [{
+                    "id": 1,
+                    "name": "unit_name_1",
+                    "desc": "unit_desc_1",
+                    "content": "unit_content_1",
+                    "chapter_id": 1,
+                    "seq": 1,
+                    "created_at": "2023-11-24T09:46:11.470+08:00",
+                    "updated_at": "2023-11-24T09:46:11.470+08:00"
+                }]
+            }]
+        },
+        "status": "ok"
+      }
+    ```
+    - 查詢失敗回傳範例    
+    ```
+      {
+        "message":"物件不存在",
+        "status":"ng"
+      }
+    ```
   - 建立課程  
     `post /courses`  
-    **Parameters**  
-    params[course]: name(string), desc(text), lecturer(string),   
-    params[course][chapters_attributes]: [name(string), seq(integer), _destroy(boolean)]  
-    params[course][chapters_attributes][units_attributes]: [name(string), desc(text), content(text), seq(integer), _destroy(boolean)]  
+    **Parameters 型態**  
+      params[course]: name(string), desc(text), lecturer(string),   
+      params[course][chapters_attributes]: [name(string), seq(integer), _destroy(boolean)]  
+      params[course][chapters_attributes][units_attributes]: [name(string), desc(text), content(text), seq(integer), _destroy(boolean)]  
+    **Parameters 範列**
+    ```
+      "course": {
+          "name": "course_name_1",
+          "lecturer": "course_lecturer_1",
+          "desc": "course_desc_1",
+          "chapters_attributes": [{
+              "name": "chapter_name_1",
+              "seq": 1,
+              "units_attributes": [{
+                  "name": "unit_name_1",
+                  "desc": "unit_desc_1",
+                  "content": "unit_content_1",
+                  "chapter_id": 1,
+                  "seq": 1
+              }]
+          }]
+      }
+    ```
+    - 建立成功回傳範例
+    ```
+      {
+        "course": {
+            "id": 1,
+            "name": "course_name_1",
+            "lecturer": "course_lecturer_1",
+            "desc": "course_desc_1",
+            "created_at": "2023-11-24T09:46:11.462+08:00",
+            "updated_at": "2023-11-24T09:48:38.496+08:00",
+            "chapters": [{
+                "id": 1,
+                "name": "chapter_name_1",
+                "course_id": 1,
+                "seq": 1,
+                "created_at": "2023-11-24T09:46:11.467+08:00",
+                "updated_at": "2023-11-24T09:46:11.467+08:00",
+                "units": [{
+                    "id": 1,
+                    "name": "unit_name_1",
+                    "desc": "unit_desc_1",
+                    "content": "unit_content_1",
+                    "chapter_id": 1,
+                    "seq": 1,
+                    "created_at": "2023-11-24T09:46:11.470+08:00",
+                    "updated_at": "2023-11-24T09:46:11.470+08:00"
+                }]
+            }]
+        },
+        "status": "ok"
+      }
+    ```
+    - 建立失敗回傳範例    
+    ```
+      {
+        "message":"errors full_messages",
+        "status":"ng"
+      }
+    ```
   - 編輯課程  
     `put /courses/{course Id}`  
-    **Parameters**  
+    **Parameters 型態**  
     params[course]: name(string), desc(text), lecturer(string),   
     params[course][chapters_attributes]: [id(integer), name(string), seq(integer), _destroy(boolean)]  
-    params[course][chapters_attributes][units_attributes]: [id(integer), name(string), desc(text), content(text), seq(integer), _destroy(boolean)]      
+    params[course][chapters_attributes][units_attributes]: [id(integer), name(string), desc(text), content(text), seq(integer), _destroy(boolean)]  
+    **Parameters 範列**
+    ```
+      {
+        "course": {
+            "name": "edit_course_name_1",
+            "lecturer": "edit_course_lecturer_1",
+            "desc": "edit_course_desc_1",
+            "chapters_attributes": [{
+                "id": 1,
+                "name": "edit_chapter_name_1",
+                "seq": 10,
+                "units_attributes": [{
+                    "id": 1,
+                    "name": "edit_unit_name_1",
+                    "desc": "ediedit_t_unit_desc_1",
+                    "content": "edit_unit_content_1",
+                    "seq": 10,
+                }]
+            }]
+        }
+      }
+    ```
+    - 編輯成功回傳範例
+    ```
+      {
+        "course": {
+            "id": 1,
+            "name": "edit_course_name_1",
+            "lecturer": "edit_course_lecturer_1",
+            "desc": "edit_course_desc_1",
+            "created_at": "2023-11-26T20:53:54.888+08:00",
+            "updated_at": "2023-11-26T22:55:27.246+08:00",
+            "chapters": [{
+                "id": 1,
+                "name": "edit_chapter_name_1",
+                "course_id": 1,
+                "seq": 10,
+                "created_at": "2023-11-26T20:53:54.893+08:00",
+                "updated_at": "2023-11-26T22:55:27.249+08:00",
+                "units": [{
+                    "id": 1,
+                    "name": "edit_unit_name_1",
+                    "desc": "ediedit_t_unit_desc_1",
+                    "content": "edit_unit_content_1",
+                    "chapter_id": 1,
+                    "seq": 10,
+                    "created_at": "2023-11-26T20:53:54.898+08:00",
+                    "updated_at": "2023-11-26T22:55:27.252+08:00"
+                }]
+            }]
+        },
+        "status": "ok"
+      }
+    ```
+    - 編輯失敗回傳範例    
+    ```
+      {
+        "message":"errors full_messages",
+        "status":"ng"
+      }
+    ```
   - 刪除課程  
     `DELETE /courses/{course Id}`  
     **No Parameters**  
+    - 刪除成功回傳範例
+    ```
+      {
+        "message":"Course was successfully destroyed",
+        "status":"ok"
+      }
+    ```
+    - 刪除失敗回傳範例
+    ```
+      {
+        "message":"errors full_messages",
+        "status":"ng"
+      }
+    ```
 * 專案的架構，API server 的架構邏輯
   **Model**
   - Course: 課程  
