@@ -49,13 +49,15 @@ RSpec.describe Api::V1::CoursesController, type: :request do
     it "課程資訊包含章節" do
       get api_v1_courses_path
       res = JSON.parse(response.body)
-      expect(res.dig('courses').sample.dig("chapters").present?).to be true
+      res_course = res.dig('courses').sample
+      expect(res_course.dig("chapters").size).to eq Course.find(res_course["id"]).chapters.size
     end
 
     it "章節資訊包含單元" do
       get api_v1_courses_path
       res = JSON.parse(response.body)
-      expect(res.dig('courses').sample.dig("chapters").sample.dig("units").present?).to be true
+      res_chapter = res.dig('courses').sample["chapters"].sample
+      expect(res_chapter.dig("units").size).to eq Chapter.find(res_chapter["id"]).units.size
     end
   end
 
