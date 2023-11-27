@@ -70,6 +70,21 @@ RSpec.describe Api::V1::CoursesController, type: :request do
       expect(response).to be_successful
     end
 
+    it "課程詳細資訊查詢成功" do
+      course = Course.all.sample
+      get api_v1_course_path(course)
+      res = JSON.parse(response.body)
+      expect(res.dig("status")).to eq "ok"
+      expect(res.dig("course", "id")).to eq course.id
+    end
+
+    it "課程詳細資訊查詢失敗" do
+      get api_v1_course_path(Course.last.id + 1)
+      res = JSON.parse(response.body)
+      expect(res.dig("status")).to eq "ng"
+      expect(res.dig("message")).to eq "物件不存在"
+    end
+
     it "課程詳細資訊包含章節資訊" do
       course = Course.all.sample
       get api_v1_course_path(course)
