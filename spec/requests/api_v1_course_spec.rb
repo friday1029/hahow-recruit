@@ -116,8 +116,9 @@ RSpec.describe Api::V1::CoursesController, type: :request do
     it "課程、章節、單元同時被建立" do
       post api_v1_courses_path(course: course_attributes)
       res = JSON.parse(response.body)
-      expect(res.dig("course", "chapters").size).to be > 0
-      expect(res.dig("course", "chapters").sample.dig("units").size).to be > 0
+      res_chapter = res.dig("course", "chapters").sample
+      expect(res.dig("course", "chapters").size).to eq Chapter.where(course_id: res_chapter["course_id"]).size
+      expect(res_chapter.dig("units").size).to eq Chapter.find(res_chapter["id"]).units.size
     end
 
     it "課程必填欄位沒填回傳錯誤" do
