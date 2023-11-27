@@ -4,7 +4,7 @@ RSpec.describe Api::V1::CoursesController, type: :request do
   before :all do
     # 建立測試用課程資料
     # 因為 model 有檢查建立課程同時要有章節跟單元,如果直接用 create 會出錯,所以先 build 好再 save.
-    rand(1..5).times.each do |i|
+    rand(10..20).times.each do |i|
       # chapters 如果直接使用 build_list,會造成產生出來的 chapters 只有一組會正常有 units
       # 所以用手工用 map 造 chapters
       # courses 不使用 build_list 也同理
