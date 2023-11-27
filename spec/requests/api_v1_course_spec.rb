@@ -113,6 +113,12 @@ RSpec.describe Api::V1::CoursesController, type: :request do
       expect(response).to be_successful
     end
 
+    it "建立課程的參數與回傳參數一致" do
+      post api_v1_courses_path(course: course_attributes)
+      res = JSON.parse(response.body)
+      expect(res.dig("course").slice("name", "lecturer", 'desc')).to eq course_attributes.slice("name", "lecturer", 'desc')
+    end
+
     it "課程、章節、單元同時被建立" do
       post api_v1_courses_path(course: course_attributes)
       res = JSON.parse(response.body)
