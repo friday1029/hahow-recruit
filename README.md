@@ -8,6 +8,9 @@
       ```
       $ git clone https://github.com/friday1029/hahow-recruit.git
       $ cd hahow-recruit
+      # 執行 Rspec 測試
+      $ rspec
+      # 執行 web server 及 webpacker server
       $ foreman s
       # http://localhost:3000/api/v1
       ```
